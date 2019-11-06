@@ -2,18 +2,20 @@
 #
 # Name: replace_substring_in_filenames.sh
 #
-# Brief: Command-line Bash script to remove common substring in multiple files in 1 directory 
-# so filenames are shorter & easier-to-read. Takes in 3 parameters at command line, e.g.,
+# Brief: Command-line Bash script to remove repeated substring in multiple 
+# LibreOffice .odt files in 1 directory - so filenames are shorter & 
+# easier-to-read. Takes in 3 parameters at command line, e.g.,
 # directory path:       /Users/kimlew/Sites/bash_projects/test_rename_files
 # string to replace:    'Inkscape Essent Train-'
 # replacement_string:   nothing or ''
 #
-# REMEMBER: If ANY comman-line arguments have spaces, you MUST put in single-quotes!
+# REMEMBER: If command-line arguments have spaces, put in single-quotes!
 # Note: Script processes only a single directory. 
 #
 # Author: Kim Lew
 
-# Check if arguments are provided. If no arguments given, display user prompts of what to enter.
+# Check if arguments are provided. If no arguments given, display user prompts 
+# of what to enter.
 if [ $# -eq 0 ]; then
   echo "Type the directory path for filenames that need changes: "
   read directory_path
@@ -56,7 +58,9 @@ echo "..."
 
 find "$directory_path" -type f -name '*.odt' |
 while read a_file_name; do
-  new_file_name="${a_file_name/$string_to_replace/}"
+  # Replace only 1st match: ${string/pattern/replacement}
+  # new_file_name="${a_file_name/string_to_replace/replacement_string}"
+  new_file_name="${a_file_name/$string_to_replace/$replacement_string}"
   mv "$a_file_name" "$new_file_name"
 done
 echo "Done."
