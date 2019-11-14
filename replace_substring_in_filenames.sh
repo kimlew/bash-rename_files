@@ -34,9 +34,11 @@ else
     echo "Enter the string to replace as the 2nd parameter." 
     exit 1
   fi
-  if [ ! "$3" ]; then
-    replacement_string=''
-  fi
+  
+  # Note: If no 3rd argument given, then is interpreted as '' empty string.
+  # if [ ! "$3" ]; then
+  #  replacement_string=''
+  # fi
   directory_path=$1
   string_to_replace=$2
   replacement_string=$3
@@ -59,7 +61,9 @@ echo "..."
 find "$directory_path" -type f -name '*.odt' |
 while read a_file_name; do
   # Replace only 1st match: ${string/pattern/replacement}
-  # new_file_name="${a_file_name/string_to_replace/replacement_string}"
+  # NOTE: Tricky since pattern must be in the specific format above & CANNOT be 
+  # a variable.
+
   new_file_name="${a_file_name/$string_to_replace/$replacement_string}"
   mv "$a_file_name" "$new_file_name"
 done
