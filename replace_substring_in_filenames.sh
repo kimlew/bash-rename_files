@@ -17,6 +17,7 @@
 # Check if arguments are provided. If no arguments given, display user prompts 
 # of what to enter.
 if [ $# -eq 0 ]; then
+  IFS=''
   echo "Type the directory path for filenames that need changes: "
   read directory_path
   
