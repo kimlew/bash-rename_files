@@ -17,6 +17,8 @@
 # Check if arguments are provided. If no arguments given, display user prompts 
 # of what to enter.
 if [ $# -eq 0 ]; then
+  # Save old IFS value & restore it after last read command.
+  OLD_IFS=$IFS
   IFS=''
   echo "Type the directory path for filenames that need changes: "
   read directory_path
@@ -26,6 +28,7 @@ if [ $# -eq 0 ]; then
 
   echo "Type the replacement string: "
   read replacement_string
+  IFS=$OLD_IFS
 else
   if [ ! "$1" ]; then
     echo "Enter the directory path as the 1st parameter." 
