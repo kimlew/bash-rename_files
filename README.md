@@ -3,10 +3,13 @@
 Name: `rename_files.sh`
 
 Command-line Bash script to replace a common substring in multiple files, 
-e.g., removes part of filename that is common to several .odt files
+e.g., removes part of filename that is common to several .odt files.
 
-Makes filenames shorter & easier-to-read. Takes in 3 parameters at command line, e.g.,
+Makes filenames shorter & easier-to-read. 
 
-- directory path: `/Users/kimlew/Sites/bash_projects/test_rename_files`
-- string to replace: `'Inkscape Essent Train-'`
-- replacement_string: nothing or `''`
+Takes 3 arguments at command line, e.g.,
+- Directory Path: `/Users/kimlew/Sites/bash_projects/test_rename_files`
+- Old Text: `'Inkscape Essent Train-'`
+- New Text: nothing or `''`
+
+OR gives user prompts if 0 arguments given.
