@@ -94,7 +94,7 @@ while read -r a_file_name; do
   # a variable.
   # -e - flag for indicating the pattern you want to match against.
 
-  if (echo "$a_file_name" | grep -q -e "$old_text"); then
+  if (echo basename "$a_file_name" | grep -q -e "$old_text"); then
     echo "FOUND $old_text IN:" "$(basename "$a_file_name")"
     new_file_name="${a_file_name/$old_text/$new_text}"
     mv "$a_file_name" "$new_file_name"
