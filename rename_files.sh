@@ -89,15 +89,18 @@ file_sort_counter=0
 start=$(date +%s)
 
 while read -r a_file_name; do
-  # Replace only 1st match: ${string/pattern/replacement}
-  # NOTE: Tricky since pattern must be in the specific format above & CANNOT be 
-  # a variable.
-  # -e - flag for indicating the pattern you want to match against.
+  directory_only=$(dirname "$a_file_name")
+  filename_only=$(basename "$a_file_name")
 
-  if (echo basename "$a_file_name" | grep -q -e "$old_text"); then
-    echo "FOUND $old_text IN:" "$(basename "$a_file_name")"
-    new_file_name="${a_file_name/$old_text/$new_text}"
-    mv "$a_file_name" "$new_file_name"
+  if (echo "$filename_only" | grep -q -e "$old_text"); then
+    # Note: -e flag indicates the pattern you want to match against.
+    echo "FOUND $old_text IN:" "$directory_only/$filename_only"
+    
+    # Replaces 1st match: ${string/pattern/replacement} in filename_only.
+    new_filename="${filename_only/$old_text/$new_text}"
+    new_filename_and_path="$directory_only/$new_filename"
+
+    mv "$a_file_name" "$new_filename_and_path"
     file_sort_counter="$((file_sort_counter+1))"
   fi
 done  < <(find "${directory_path}" -maxdepth 1 -type f -name '*.odt')
@@ -109,7 +112,7 @@ difference=$((end - start))
 echo "Processing Time:" $((difference/60)) "min(s)" $((difference%60)) "sec(s)" 
 
 if [ "${file_sort_counter}" -eq 0 ]; then
-  echo "$old_text was NOT found in filenames or there are NO .odt files at the top-level of the path."
+  echo "$old_text was NOT found in filenames, file is NOT .odt or NO .odt files found at path's top-level ."
 fi
 echo
 
