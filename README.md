@@ -1,13 +1,15 @@
-## Bash script to replace substring in multiple files in 1 directory
+# Bash script to rename multiple files in 1 directory
 
-Name: ```replace_substring_in_filenames.sh```
+Name: `rename_files.sh`
 
-Command-line Bash script to remove common substring in multiple files in 1 directory so filenames are shorter & easier-to-read. Takes in 3 parameters at command line, e.g.,
+Command-line Bash script to replace a common substring in multiple files, 
+e.g., removes part of filename that is common to several .odt files.
 
-- directory path: ```/Users/kimlew/Sites/bash_projects/test_rename_files```
-- string to replace: ```'Inkscape Essent Train-'```
-- replacement_string: nothing or ```''```
+Makes filenames shorter & easier-to-read. 
 
-**REMEMBER**: If ANY command-line arguments have spaces, you MUST put in single-quotes!
+Takes 3 arguments at command line, e.g.,
+- Directory Path: `/Users/kimlew/Sites/bash_projects/test_rename_files`
+- Old Text: `'Inkscape Essent Train-'`
+- New Text: nothing or `''`
 
-**Note**: Script processes only a single directory.
+OR gives user prompts if 0 arguments given.

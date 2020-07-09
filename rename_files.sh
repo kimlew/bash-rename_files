@@ -1,76 +1,119 @@
 #! /usr/bin/env bash
 #
-# Name: replace_substring_in_filenames.sh
+# Name: rename_files.sh
 #
-# Brief: Command-line Bash script to remove repeated substring in multiple 
-# LibreOffice .odt files in 1 directory - so filenames are shorter & 
-# easier-to-read. Takes in 3 parameters at command line, e.g.,
-# directory path:       /Users/kimlew/Sites/bash_projects/test_rename_files
-# string to replace:    'Inkscape Essent Train-'
-# replacement_string:   nothing or ''
-#
-# REMEMBER: If command-line arguments have spaces, put in single-quotes!
-# Note: Script processes only a single directory. 
-#
+# Brief: Command-line Bash script to remove common text in multiple LibreOffice
+# .odt filenames in 1 directory - so filenames are shorter & easier-to-read.
+
+# Takes in 3 parameters at command line, e.g.,
+# Directory Path:       /Users/kimlew/Sites/bash_projects/test_rename_files
+# Old Text:    'Inkscape Essent Train-'
+# New Text:   nothing or ''
+
+# OR gives user prompts if 0 arguments given.
+
 # Author: Kim Lew
 
-# Check if arguments are provided. If no arguments given, display user prompts 
-# of what to enter.
-if [ $# -eq 0 ]; then
-  # Save old IFS value & restore it after last read command.
-  OLD_IFS=$IFS
-  IFS=''
-  echo "Type the directory path for filenames that need changes: "
-  read directory_path
-  
-  echo "Type the string to replace: "
-  read string_to_replace
+check_for_arguments() {
+  # Check if command-line arguments given. If user gives:
+  # 3+ arguments - see message with hint that this is wrong.
+  # 3 arguments - passes in the all args with $@.
+  # 1 or 2 arguments - see message with hint of what is wrong.s
+  # 0 arguments - display user prompts for each of 3 required inputs.
 
-  echo "Type the replacement string: "
-  read replacement_string
-  IFS=$OLD_IFS
-else
-  if [ ! "$1" ]; then
-    echo "Enter the directory path as the 1st parameter." 
+  if [ $# -gt 3 ]; then 
+    # Case of 4 or more parameters given.
+    echo "Give 3 command-line arguments. Or give 0 arguments & get prompts."
     exit 1
   fi
-  if [ ! "$2" ]; then
-    echo "Enter the string to replace as the 2nd parameter." 
-    exit 1
-  fi
+
+  if [ "$#" -eq 0 ]; then # Show prompts.
+    # Save old IFS value & restore it after last read command.
+    OLD_IFS=$IFS
+    IFS=''
+    
+    echo "Type the directory path: "
+    read -r directory_path
   
-  # Note: If no 3rd argument given, then is interpreted as '' empty string.
-  # if [ ! "$3" ]; then
-  #  replacement_string=''
-  # fi
-  directory_path=$1
-  string_to_replace=$2
-  replacement_string=$3
-fi
+    echo "Type the old text: "
+    read -r old_text
 
-echo "Directory path you typed: $directory_path"
-echo "String to replace you typed: $string_to_replace"
-echo "Replacement string you typed: $replacement_string"
-echo
+    echo "Type the new text: "
+    read -r new_text
+    IFS=$OLD_IFS
+  elif [ $# -lt 3 ]; then # Not enough command-line arguments given. Requires 3.
+    echo "$need_single_quotes"
+    echo "3 arguments are required."
+    if [ $# -lt 2 ]; then # Show message when user only gives 1 command-line argument.
+      echo "You are missing 2 arguments."
+    else
+      # Show message when user only gives 2 command-line arguments. 
+      echo "You are missing 1 argument."
+    fi
+    # Note: You must give '' empty string as 3rd argument if you want to replace 
+    # with nothing , i.e., remove text.
+    exit 1
+  else # Gave required 3 command-line arguments.
+    directory_path="$1"
+    old_text="$2"
+    new_text="$3"
+  fi
+}
 
-if [ ! -d "$directory_path" ] 
-then
+print_arguments() {
+  directory_path=${directory_path}
+
+  echo "Checking:"
+  echo "Directory path: $directory_path"
+  check_directory "$directory_path"
+
+  echo "Old text: $old_text"
+  echo "New text: $new_text"
+  echo
+}
+
+check_directory() {
+  if [ ! -d "$directory_path" ] 
+  then
     echo "This directory does NOT exist."
     exit 1
+  fi
+}
+
+need_single_quotes="If argument has SPACES, place argument within single quotes."
+check_for_arguments "$@"
+print_arguments
+
+echo "Checking files..."
+file_sort_counter=0
+start=$(date +%s)
+
+while read -r a_file_name; do
+  directory_only=$(dirname "$a_file_name")
+  filename_only=$(basename "$a_file_name")
+
+  if (echo "$filename_only" | grep -q -e "$old_text"); then
+    # Note: -e flag indicates the pattern you want to match against.
+    echo "FOUND $old_text IN:" "$directory_only/$filename_only"
+    
+    # Replaces 1st match: ${string/pattern/replacement} in filename_only.
+    new_filename="${filename_only/$old_text/$new_text}"
+    new_filename_and_path="$directory_only/$new_filename"
+
+    mv "$a_file_name" "$new_filename_and_path"
+    file_sort_counter="$((file_sort_counter+1))"
+  fi
+done  < <(find "${directory_path}" -maxdepth 1 -type f -name '*.odt')
+echo
+echo "DONE. Number of files renamed: " "${file_sort_counter}"
+
+end=$(date +%s)
+difference=$((end - start))
+echo "Processing Time:" $((difference/60)) "min(s)" $((difference%60)) "sec(s)" 
+
+if [ "${file_sort_counter}" -eq 0 ]; then
+  echo "$old_text was NOT found in filenames, file is NOT .odt or NO .odt files found at path's top-level ."
 fi
-
-echo "Filename change in progress..."
-echo "..."
-
-find "$directory_path" -type f -name '*.odt' |
-while read a_file_name; do
-  # Replace only 1st match: ${string/pattern/replacement}
-  # NOTE: Tricky since pattern must be in the specific format above & CANNOT be 
-  # a variable.
-
-  new_file_name="${a_file_name/$string_to_replace/$replacement_string}"
-  mv "$a_file_name" "$new_file_name"
-done
-echo "Done."
+echo
 
 exit 0
